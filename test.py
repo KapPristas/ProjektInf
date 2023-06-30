@@ -4,10 +4,10 @@ import csv
 import yaml
 
 REACTION_KEYS = ["z", "x", "n", "m", "f7", "f8"]
-RESULTS = [["NR_EXP", "NR_TRIAL", "ST", "STIMULI COLOR", "STIMULI CONTENT", "ACC", "RT", "EXPE_ANS", "ANSWER", 'a', 'b', 'c',]]
-a = 6 #correct stimuli
-b = 6 #incorrect stimuli
-c = 3 #neutral stimuli
+RESULTS = [["NR_EXP", "NR_TRIAL", "ST", "STIMULI COLOR", "STIMULI CONTENT", "ACC", "RT", "EXPE_ANS", "ANSWER"]]
+remCorr = 6 #remaining correct stimuli
+remInco = 6 #remaining incorrect stimuli
+remNeut = 3 #remaining neutral stimuli
 ST = None #stimuli type
 
 def reactions(keys):
@@ -57,25 +57,25 @@ def fix():
     core.wait(0.9)
 
 def loop(col, stim_type):
-        global a
-        global b
-        global c
+        global remCorr
+        global remInco
+        global remNeut
         if (col == "ZIELONY" and stim_type == 'z') or (col == "NIEBIESKI" and stim_type == 'x') or (col == "CZERWONY" and stim_type == 'n') or (col == "BRAZOWY" and stim_type == 'm'):
-            if a <= 0:
-                a1 = {"ZIELONY", "NIEBIESKI", "CZERWONY", "BRAZOWY", "ROZOWY"}
-                a1.remove(col)
-                col = random.choice(list(a1))
+            if remCorr <= 0:
+                remCorr1 = {"ZIELONY", "NIEBIESKI", "CZERWONY", "BRAZOWY", "ROZOWY"}
+                remCorr1.remove(col)
+                col = random.choice(list(remCorr1))
             else:
-                a -= 1
+                remCorr -= 1
                 return col
         elif col == "ROZOWY":
-            if c <= 0:
+            if remNeut <= 0:
                 col = random.choice(list({"ZIELONY", "NIEBIESKI", "CZERWONY", "BRAZOWY"}))
             else:
-                c -= 1
+                remNeut -= 1
                 return col
         else:
-            if b <= 0:
+            if remInco <= 0:
                 if a <= 0:
                     col = "ROZOWY"
                 else:
@@ -88,7 +88,7 @@ def loop(col, stim_type):
                     elif stim_type == 'm':
                         col = "BRAZOWY"
             else:
-                b -= 1
+                remInco -= 1
                 return col
         return loop(col, stim_type)
 
@@ -144,7 +144,7 @@ def part_of_experiment(n_trials, keys, experiment):
         
         
         feedback(acc, experiment)
-        RESULTS.append([conf['EXPNUM'] ,i + 1, ST, color, col, acc, rt, stim_type, key, a, b, c])
+        RESULTS.append([conf['EXPNUM'] ,i + 1, ST, color, col, acc, rt, stim_type, key])
         ST = None
         color = None
 
@@ -162,18 +162,18 @@ expend = visual.ImageStim(win=win, image="expend.png")
 show_text(info=inst_tr, win=win)
 for i in range (3):
     part_of_experiment(conf['N_TRIALS_TRAINING'], REACTION_KEYS, experiment=False)
-    a = 6
-    b = 6
-    c = 3
+    remCorr = 6
+    remInco = 6
+    remNeut = 3
     if i <2:
         show_text(info=trbreak, win=win)
     else:
         show_text(info=trend, win=win)
 
 for i in range (3):
-    a = 32
-    b = 32
-    c = 16
+    remCorr = 32
+    remInco = 32
+    remNeut = 16
     part_of_experiment(conf['N_TRIALS_EXPERIMENT'], REACTION_KEYS, experiment=True)
     if i <2:
         show_text(info=expbreak, win=win)

@@ -56,10 +56,7 @@ def fix():
     win.flip()
     core.wait(0.9)
 
-def loop(col, stim_type):
-        global remCorr
-        global remInco
-        global remNeut
+def loop(col, stim_type, remCorr, remInco, remNeut):
         if (col == "ZIELONY" and stim_type == 'z') or (col == "NIEBIESKI" and stim_type == 'x') or (col == "CZERWONY" and stim_type == 'n') or (col == "BRAZOWY" and stim_type == 'm'):
             if remCorr <= 0:
                 remCorr1 = {"ZIELONY", "NIEBIESKI", "CZERWONY", "BRAZOWY", "ROZOWY"}
@@ -92,7 +89,7 @@ def loop(col, stim_type):
                 return col
         return loop(col, stim_type)
 
-def part_of_experiment(n_trials, keys, experiment):
+def part_of_experiment(n_trials, keys, remCorr, remInco, remNeut, experiment):
     for i in range(n_trials):
         fix()
         
@@ -104,7 +101,7 @@ def part_of_experiment(n_trials, keys, experiment):
         }
         stim_type = random.choice(list(stim.keys()))
 
-        col = loop(col, stim_type)
+        col = loop(col, stim_type, remCorr, remInco, remNeut)
         
         stim[stim_type].text = col
         if stim_type == "z":
@@ -153,7 +150,7 @@ win = visual.Window(units="pix", size=(890, 890), color="#C0C0C0", fullscr=False
 clock = core.Clock()
 win.setMouseVisible(False)
 inst_tr = visual.ImageStim(win=win, image="inst.png")
-top = visual.ImageStim(win=win, image="top.png", pos=(0, +350))
+top = visual.TextStim(win=win, text="z = zielony, x = niebieski, n = czerwony, m = brazowy", pos=(0, +350))
 trbreak = visual.ImageStim(win=win, image="tpbreak.png")
 trend = visual.ImageStim(win=win, image="trend.png")
 expbreak = visual.ImageStim(win=win, image="expbreak.png")
@@ -161,10 +158,10 @@ expend = visual.ImageStim(win=win, image="expend.png")
 
 show_text(info=inst_tr, win=win)
 for i in range (3):
-    part_of_experiment(conf['N_TRIALS_TRAINING'], REACTION_KEYS, experiment=False)
     remCorr = 6
     remInco = 6
     remNeut = 3
+    part_of_experiment(conf['N_TRIALS_TRAINING'], REACTION_KEYS, remCorr, remInco, remNeut, experiment=False)
     if i <2:
         show_text(info=trbreak, win=win)
     else:
@@ -174,7 +171,7 @@ for i in range (3):
     remCorr = 32
     remInco = 32
     remNeut = 16
-    part_of_experiment(conf['N_TRIALS_EXPERIMENT'], REACTION_KEYS, experiment=True)
+    part_of_experiment(conf['N_TRIALS_EXPERIMENT'], REACTION_KEYS, remCorr, remInco, remNeut, experiment=True)
     if i <2:
         show_text(info=expbreak, win=win)
     else:
